@@ -1,19 +1,42 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import api from "../services/api";
 import type { Menu } from "@/types/menu";
 import type { CartItem } from "@/types/cartItem";
 import { Input } from "@/components/ui/input";
 import { Button } from "@base-ui/react/button";
+import { useCart } from "./CartContext";
 
 import { ArrowRight } from "lucide-react";
 
 function Home() {
+  const navigate = useNavigate();
   const [menus, setMenus] = useState<Menu[]>([]);
   const [kategori, setKategori] = useState("Semua");
-  const [cartItems, setcartItems] = useState<CartItem[]>([]);
+  const [searchParams] = useSearchParams();
+
+  const meja = searchParams.get("meja");
+  const mejaId = meja ? Number(meja) : null;
+
+  const {
+    cartItems,
+    addCartItem,
+    increaseQty,
+    decreaseQty,
+    totalQtyCart,
+    subTotalPrice,
+    setMejaId,
+  } = useCart();
 
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    if (mejaId) {
+      setMejaId(mejaId);
+    }
+  }, [mejaId, setMejaId]);
 
   useEffect(() => {
     const fechMenu = async () => {
@@ -30,54 +53,6 @@ function Home() {
     fechMenu();
   }, []);
 
-  const increaseQty = (menuId: number) => {
-    const updateCart = cartItems.map((item) =>
-      item.menuId === menuId ? { ...item, jumlah: item.jumlah + 1 } : item,
-    );
-
-    setcartItems(updateCart);
-  };
-
-  const decreaseQty = (menuId: number) => {
-    const updateCart = cartItems
-      .map((item) =>
-        item.menuId === menuId ? { ...item, jumlah: item.jumlah - 1 } : item,
-      )
-
-      .filter((item) => item.jumlah > 0);
-
-    setcartItems(updateCart);
-  };
-
-  const totalQtyCart = cartItems.reduce(
-    (total, item) => total + item.jumlah,
-    0,
-  );
-
-  const totalPriceCart = cartItems.reduce(
-    (total, item) => total + item.harga * item.jumlah,
-    0,
-  );
-
-  const addCartItem = (menu: Menu) => {
-    const existingItem = cartItems.find((item) => item.menuId === menu.id);
-
-    if (existingItem) {
-      increaseQty(menu.id);
-      return;
-    }
-
-    setcartItems([
-      ...cartItems,
-      {
-        menuId: menu.id,
-        menu: menu.menu,
-        jumlah: 1,
-        harga: menu.harga,
-      },
-    ]);
-  };
-
   const filerSearch = menus.filter((item) =>
     item.menu.toLowerCase().includes(search.toLowerCase()),
   );
@@ -91,9 +66,19 @@ function Home() {
     return <div>memuat...</div>;
   }
 
+  const handleDetailOrder = () => {
+    if (cartItems.length === 0) {
+      alert("Keranjang masih kosong");
+      return;
+    }
+
+    navigate("/detail-order");
+  };
+
   return (
     <div>
       <h1>list menu restoran</h1>
+      <p>Meja: {mejaId}</p>
       <div>
         <Input
           type="text"
@@ -135,8 +120,8 @@ function Home() {
         <div>
           <h2>Cart Item</h2>
           <span>{totalQtyCart}</span>
-          <span>Rp. {totalPriceCart.toLocaleString("id-ID")}</span>
-          <Button>
+          <span>Rp. {subTotalPrice.toLocaleString("id-ID")}</span>
+          <Button onClick={handleDetailOrder}>
             Lihat detail pesanan <ArrowRight />
           </Button>
         </div>
