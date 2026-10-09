@@ -180,21 +180,22 @@ function Home() {
                   className="bg-white rounded-2xl border border-[#D3D4C0] shadow-sm overflow-hidden">
                   <div className="flex items-stretch min-h-36">
                     <div className="w-32 sm:w-40 shrink-0 bg-[#F3E4C9]/35 flex items-center justify-center">
-                      {item.image ? (
+                      {/* {item.image ? (
                         <img
                           src={item.image}
                           alt={item.menu}
                           className="w-full h-full object-cover"
                         />
                       ) : (
-                        <div className="text-center px-2">
-                          <ShoppingBag className="h-8 w-8 mx-auto text-[#8B5E3C]/60" />
+                       
+                      )}  */}
+                      <div className="text-center px-2">
+                        <ShoppingBag className="h-8 w-8 mx-auto text-[#8B5E3C]/60" />
 
-                          <p className="text-[10px] font-medium text-[#8B5E3C] mt-2">
-                            Tidak ada gambar
-                          </p>
-                        </div>
-                      )}
+                        <p className="text-[10px] font-medium text-[#8B5E3C] mt-2">
+                          Tidak ada gambar
+                        </p>
+                      </div>
                     </div>
 
                     <div className="flex-1 min-w-0 p-3.5 sm:p-4 flex flex-col justify-between">
